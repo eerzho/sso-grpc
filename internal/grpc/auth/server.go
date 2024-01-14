@@ -8,7 +8,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"sso/internal/services/auth"
-	"sso/internal/storage"
 )
 
 type Auth interface {
@@ -50,7 +49,7 @@ func (this *serverApi) Register(ctx context.Context, req *ssov1.RegisterRequest)
 
 	userId, err := this.auth.Register(ctx, req.GetEmail(), req.GetPassword())
 	if err != nil {
-		if errors.Is(err, storage.ErrUserExists) {
+		if errors.Is(err, auth.ErrUserExists) {
 			return nil, status.Error(codes.AlreadyExists, "user already exists")
 		}
 
@@ -67,7 +66,7 @@ func (this *serverApi) IsAdmin(ctx context.Context, req *ssov1.IsAdminRequest) (
 
 	isAdmin, err := this.auth.IsAdmin(ctx, req.GetUserId())
 	if err != nil {
-		if errors.Is(err, storage.ErrUserNotFound) {
+		if errors.Is(err, auth.ErrUserNotFound) {
 			return nil, status.Error(codes.NotFound, "user not found")
 		}
 
